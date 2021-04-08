@@ -1,60 +1,37 @@
 int chooseBestDistance(int t, int k, List<int> ls) {
-  List<int> l = [];
-
-  // Якщо кількість доступних міст менше за кількість міст необхідних для відвідування повертаємо -1.
-  if (ls.length < k) {
+  if (ls.length < k || t < 0 || k < 1 || ls.isEmpty) {
     return -1;
   }
+  return recursionNextStep(0, k - 1, t, -1, 0, ls);
+}
 
-  if (k > 2) {
-    // Цикли що суммують необхідну кількість елементів.
-    for (int i = 0; i < ls.length - 1; i++) {
-      for (int j = i + 1; j < ls.length - (k - 2); j++) {
-        // Тимчасова змінна для суми елементів більших за 3 индекс вхідного листа.
-        int r = 0;
-        for (int n = 2; n < k - 1; n++) {
-          r = r + ls[j + n];
-        }
-        l.add(ls[i] + ls[j] + ls[j + 1] + r);
-      }
+int recursionNextStep(int startIndex, int count, int maxDistance, int bestValue,
+    int previousValue, List<int> ls) {
+  for (int i = startIndex; i < ls.length; i++) {
+    int innerResult = previousValue + ls[i];
+
+    if (count != 0) {
+      innerResult = recursionNextStep(
+          i + 1, count - 1, maxDistance, bestValue, innerResult, ls);
     }
-  } else {
-    // Сума елементів якщо кількість міст = 2
-    for (int i = 0; i < ls.length - 1; i++) {
-      for (int j = i + 1; j < ls.length; j++) {
-        l.add(ls[i] + ls[j]);
-      }
+
+    if (bestValue < innerResult && innerResult <= maxDistance) {
+      bestValue = innerResult;
     }
   }
 
-  l.sort();
-//   l.forEach((element)=>print("///////// $element //////////"));
-
-  // Перевірки
-
-  if (l.contains(t)) {
-    return t;
-  }
-
-  if (l[0] > t) {
-    return -1;
-  }
-
-  if (l[l.length - 1] < t) {
-    return l[l.length - 1];
-  }
-
-  for (int i = 0; i < l.length; i++) {
-    if (l[i] > t) {
-      return l[i - 1];
-    }
-  }
+  return bestValue;
 }
 
 void main() {
+  print(chooseBestDistance(0, 0, [])); //-1
+  print(chooseBestDistance(
+      1235, 1, [18, 174, 348, 366, 150, 30, 115, 266, 351, 484, 281])); //484
+  print(chooseBestDistance(21, 2, [1, 2, 3, 4, 5, 4, 3, 23, 1, 12, 4])); //17
   print(chooseBestDistance(174, 3, [51, 56, 58, 59, 61])); //173
-  print(chooseBestDistance(163, 3, [50])); //-1
-  print(chooseBestDistance(13, 5, [1, 2, 3, 4, 5, 6, 7, 8])); //-1
-  print(chooseBestDistance(20, 2, [1, 4, 3, 2, 3, 2])); //7
-  print(chooseBestDistance(20, 1, [1, 4, 3, 2, 3, 2])); //7
+  print(chooseBestDistance(163, 3, [50])); // -1
+  print(chooseBestDistance(
+      1967, 4, [201, 402, 359, 420, 59, 102, 293, 393, 332, 148])); //1574
+  print(chooseBestDistance(
+      1472, 5, [317, 377, 170, 67, 391, 395, 477, 473, 56, 414])); // 1471
 }
